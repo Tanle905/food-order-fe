@@ -26,7 +26,7 @@ export default function RootLayout({
           <CacheProvider value={cache}>
             <ThemeProvider theme={darkTheme}>
               <CssBaseline />
-              <Box pb={5} className="min-h-screen bg-gray-900 px-10">
+              <Box pb={5} className="min-h-screen">
                 <OGHeader />
                 {children}
               </Box>

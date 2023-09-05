@@ -34,12 +34,6 @@ export function MCSidebarMenu(props: any) {
       open={open}
       anchor="right"
       variant="persistent"
-      className="bg-gray-900"
-      PaperProps={{
-        sx: {
-          background: "#111827",
-        },
-      }}
       sx={{
         "& .MuiDrawer-paper": { boxSizing: "border-box", width: 300 },
       }}
@@ -53,14 +47,17 @@ export function MCSidebarMenu(props: any) {
       <List>
         {sidebarMenuItems.map((item, index) => (
           <>
-            <ListItemButton onClick={() => handleNavigate(item.link)}>
+            <ListItemButton
+              key={index}
+              onClick={() => handleNavigate(item.link)}
+            >
               <ListItemIcon>{item.icon && item.icon}</ListItemIcon>
               <ListItemText primary={item.title} />
             </ListItemButton>
             {item.children && (
               <Collapse in={true} timeout="auto" unmountOnExit>
                 {item.children.map((child, i) => (
-                  <List>
+                  <List key={i}>
                     <ListItemButton sx={{ pl: 4 }}>
                       <ListItemIcon>{child.icon}</ListItemIcon>
                       <ListItemText primary={child.title} />

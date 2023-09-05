@@ -1,45 +1,17 @@
 import { createTheme } from "@mui/material";
 
 export const darkTheme = createTheme({
-    palette: {
-      mode: "dark",
+  palette: {
+    mode: "dark",
+    primary: {
+      main: "#6366f1",
     },
-    components: {
-      MuiTypography: {
-        variants: [
-          {
-            props: {
-              variant: "h1",
-            },
-            style: {
-              color: "white",
-            },
-          },
-          {
-            props: {
-              variant: "subtitle1",
-            },
-            style: {
-              color: "white",
-            },
-          },
-          {
-            props: {
-              variant: "subtitle2",
-            },
-            style: {
-              color: "white",
-            },
-          },
-          {
-            props: {
-              variant: "body1",
-            },
-            style: {
-              color: "white",
-            },
-          },
-        ],
-      },
+    secondary: {
+      main: "#f50057",
     },
-  });
+    background: {
+      default: "#020617",
+      paper: "#0f172a",
+    },
+  },
+});

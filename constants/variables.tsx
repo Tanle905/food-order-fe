@@ -36,3 +36,28 @@ export const sidebarMenuItems: SidebarMenuItem[] = [
     ],
   },
 ];
+// Order Variables
+export const orderTypeOptions = [
+  {
+    label: "All",
+    value: 0,
+  },
+  {
+    label: "Foods",
+    value: 1,
+  },
+  {
+    label: "Drinks",
+    value: 2,
+  },
+];
+export const orderVisibilityOptions = [
+  {
+    label: "Public",
+    value: 0,
+  },
+  {
+    label: "Private",
+    value: 1,
+  },
+];

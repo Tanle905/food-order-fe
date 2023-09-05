@@ -4,7 +4,7 @@ export function ATBranding() {
   return (
     <Stack className="text-white" direction="row" spacing={2} alignItems="center">
       <FastfoodIcon fontSize="large" />
-      <Typography variant="h5">
+      <Typography fontWeight={600} variant="h5">
         FOOD ORDER.
       </Typography>
     </Stack>

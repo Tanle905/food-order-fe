@@ -1,5 +1,10 @@
 import { GridColDef } from "@mui/x-data-grid";
 
+export interface ResourceConfig<T> {
+  resourceType: "table" | "tab" | "two-columns";
+  resourceProps: T;
+}
+
 export interface TableConfig {
   apiEndpoint?: string;
   data?: any;

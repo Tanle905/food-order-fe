@@ -22,7 +22,7 @@ import {
 } from "@mui/x-data-grid";
 import axios from "axios";
 import _ from "lodash";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
 
 interface OGTableProps {
@@ -33,11 +33,10 @@ interface TablePaginationProps {
   rowCount: number;
 }
 interface TableQuery {
-  [key: string]: any;
   page: number;
   pageSize: number;
-  sort?: string;
   order?: "asc" | "desc";
+  orderBy?: string;
 }
 
 const defaultPageSize = 25;
@@ -133,9 +132,12 @@ export function OGTable({ route }: OGTableProps) {
   function handleSort(model: GridSortModel) {
     const sortData = model[0];
 
+    if (query.orderBy === sortData?.field && query.order === sortData?.sort)
+      return;
+
     handleSetQuery({
-      orderBy: sortData ? sortData.field : null,
-      order: sortData ? sortData.sort : null,
+      orderBy: sortData?.field,
+      order: sortData?.sort,
     });
   }
 
@@ -150,26 +152,45 @@ export function OGTable({ route }: OGTableProps) {
 
   return (
     <Stack gap={2} height={630}>
-      {route.search && !_.isEmpty(route.search()) && (
-        <TextField
-          size="small"
-          className="w-1/4"
-          variant="outlined"
-          placeholder="Search"
-          onChange={handleSearchDebounced}
-        />
-      )}
+      <Stack direction="row" alignItems="center" justifyContent="space-between">
+        <Stack gap={2}>
+          <Stack gap={2} direction="row" alignItems="center">
+            {route.title && (
+              <Typography variant="h6" className="min-w-fit">
+                {route.title}
+              </Typography>
+            )}
+            {route.search && !_.isEmpty(route.search()) && (
+              <TextField
+                size="small"
+                className="w-6/12"
+                variant="outlined"
+                placeholder="Search"
+                onChange={handleSearchDebounced}
+              />
+            )}
+          </Stack>
+          {route.subTitle && (
+            <Typography variant="subtitle1">{route.subTitle}</Typography>
+          )}
+        </Stack>
+        {route.extraRightComponent &&
+          route.extraRightComponent.map((c, i) => c({ key: i, href: "sdf" }))}
+      </Stack>
       <DataGrid
         pagination
         checkboxSelection
         disableRowSelectionOnClick
         rowCount={rowCount}
-        sortModel={[
-          {
-            field: query.orderBy,
-            sort: query.order,
-          },
-        ]}
+        sortModel={useMemo(
+          () => [
+            {
+              field: query.orderBy ?? "",
+              sort: query.order,
+            },
+          ],
+          [query]
+        )}
         onSortModelChange={handleSort}
         sortingMode="server"
         paginationMode="server"
