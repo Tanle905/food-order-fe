@@ -10,7 +10,7 @@ import {
   orderTypeOptions,
   orderVisibilityOptions,
 } from "@/constants/variables";
-import { object, string } from "yup";
+import { array, object, string } from "yup";
 import { MuiFileInput } from "mui-file-input";
 import { isEmpty } from "lodash";
 
@@ -19,7 +19,14 @@ const addOrderFormMeta: FormBuilderMeta = {
   validationSchema: object({
     orderName: string()
       .max(20, "Order Name can not be longer than 20 characters")
-      .required("Order Name is reuqired"),
+      .required("Order Name is required"),
+    orderLink: string().required().max(
+      100,
+      "Order Link cannot be longer than 100 characters"
+    ),
+    orderType: string().required(),
+    orderVisibility: string().required(),
+    menu: array().required().min(1, 'dsfsdf'),
   }),
   initialValues: {
     orderType: 0,
@@ -34,6 +41,7 @@ const addOrderFormMeta: FormBuilderMeta = {
       label: "Order Name",
       type: "text",
       colSpan: 2,
+      required: true,
     },
     {
       name: "orderLink",
@@ -45,6 +53,7 @@ const addOrderFormMeta: FormBuilderMeta = {
       name: "orderType",
       label: "Order Type",
       select: true,
+      required: true,
       children: orderTypeOptions.map((o, i) => (
         <MenuItem key={i} value={o.value}>
           {o.label}
@@ -90,16 +99,18 @@ const addOrderFormMeta: FormBuilderMeta = {
 export function MCAddNewOrderModal() {
   const [form, setForm] = useState<FormikProps<any>>();
 
+  async function handleSubmitForm() {
+    const errors = await form?.validateForm();
+    await form?.submitForm();
+
+    if (!isEmpty(errors)) throw new Error();
+  }
+
   return (
     <ATLargeModal
       title="Add New Order"
       triggerElement={<Button variant="contained">Add New Order</Button>}
-      onOk={async () => {
-        const errors = await form?.validateForm();
-        await form?.submitForm();
-        
-        if (!isEmpty(errors)) throw new Error();
-      }}
+      onOk={handleSubmitForm}
     >
       <MUIFormBuilder meta={{ ...addOrderFormMeta, setForm }} />
     </ATLargeModal>
