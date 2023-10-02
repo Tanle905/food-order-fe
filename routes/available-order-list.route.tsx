@@ -58,7 +58,7 @@ export const availableOrderList: TableConfig = {
         field: "orderLink",
         headerName: "Order Link",
         flex: 0.5,
-        renderCell(params) {
+        renderCell(params:any) {
           return <Link href={params.value}>Link</Link>;
         },
       },
