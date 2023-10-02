@@ -4,15 +4,14 @@ import {
   FormBuilderMeta,
   MUIFormBuilder,
 } from "../forms/mui-form-builder.molecule";
-import { FormikProps } from "formik";
-import { useState } from "react";
+import { FormikBag, FormikProps, FormikValues } from "formik";
 import {
   orderTypeOptions,
   orderVisibilityOptions,
 } from "@/constants/variables";
 import { array, object, string } from "yup";
 import { MuiFileInput } from "mui-file-input";
-import { isEmpty } from "lodash";
+import { useRef } from "react";
 
 const addOrderFormMeta: FormBuilderMeta = {
   columns: 3,
@@ -20,21 +19,18 @@ const addOrderFormMeta: FormBuilderMeta = {
     orderName: string()
       .max(20, "Order Name can not be longer than 20 characters")
       .required("Order Name is required"),
-    orderLink: string().required().max(
-      100,
-      "Order Link cannot be longer than 100 characters"
-    ),
+    orderLink: string()
+      .required("Order Link is required")
+      .max(100, "Order Link cannot be longer than 100 characters"),
     orderType: string().required(),
     orderVisibility: string().required(),
-    menu: array().required().min(1, 'dsfsdf'),
+    menu: array().required("Menu Image is required").min(1, "Min 1 file"),
   }),
   initialValues: {
     orderType: 0,
     orderVisibility: 0,
   },
-  handleSubmit(values) {
-    console.log(values);
-  },
+  handleSubmit: handleSubmitForm,
   fields: [
     {
       name: "orderName",
@@ -96,23 +92,25 @@ const addOrderFormMeta: FormBuilderMeta = {
   ],
 };
 
+async function handleSubmitForm(values: any, formikBag: any) {
+  console.log(values);
+}
+
 export function MCAddNewOrderModal() {
-  const [form, setForm] = useState<FormikProps<any>>();
-
-  async function handleSubmitForm() {
-    const errors = await form?.validateForm();
-    await form?.submitForm();
-
-    if (!isEmpty(errors)) throw new Error();
-  }
+  const formRef = useRef<FormikProps<any>>();
 
   return (
     <ATLargeModal
       title="Add New Order"
       triggerElement={<Button variant="contained">Add New Order</Button>}
-      onOk={handleSubmitForm}
+      onOk={async () => {
+        const result = await formRef.current?.validateForm();
+
+        formRef.current?.submitForm();
+        if (result) throw new Error();
+      }}
     >
-      <MUIFormBuilder meta={{ ...addOrderFormMeta, setForm }} />
+      <MUIFormBuilder meta={{ ...addOrderFormMeta, innerRef: formRef }} />
     </ATLargeModal>
   );
 }

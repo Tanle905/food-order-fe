@@ -1,7 +1,7 @@
 import { Grid, TextFieldProps, TextField } from "@mui/material";
-import { FormikValues, useFormik } from "formik";
+import { Formik, FormikBag, FormikHelpers, useFormikContext } from "formik";
 import { isEmpty } from "lodash";
-import { ReactElement, useEffect } from "react";
+import { ReactElement } from "react";
 import { ObjectSchema } from "yup";
 
 interface MUIFormBuilderProps {
@@ -12,8 +12,12 @@ export interface FormBuilderMeta {
   columns?: number;
   initialValues?: any;
   validationSchema?: ObjectSchema<any>;
-  setForm?: any;
-  handleSubmit: (values: any) => any;
+  handleSubmit: ((
+    values: any,
+    formikHelpers: FormikHelpers<any>
+  ) => void | Promise<any>) &
+    ((values: any, formikBag: FormikBag<any, any>) => any);
+  innerRef?: any;
   fields: (TextFieldProps & {
     name: string;
     colSpan?: number;
@@ -21,52 +25,65 @@ export interface FormBuilderMeta {
   })[];
 }
 
-export function MUIFormBuilder<T extends FormikValues>({
-  meta,
-}: MUIFormBuilderProps) {
-  const { initialValues, validationSchema, fields, columns, setForm } = meta;
-  const formik = useFormik<T>({
-    initialValues: !isEmpty(initialValues)
-      ? initialValues
-      : fields.reduce((prev, cur) => ({ ...prev, [cur.name]: "" }), {}),
+export function MUIFormBuilder({ meta }: MUIFormBuilderProps) {
+  const {
+    initialValues,
     validationSchema,
-    onSubmit: meta.handleSubmit,
-    onReset: () => {},
-  });
-
-  useEffect(() => {
-    setForm && setForm(formik);
-  }, []);
+    fields,
+    columns,
+    innerRef,
+    handleSubmit,
+  } = meta;
 
   return (
-    <form onSubmit={formik.handleSubmit}>
-      <Grid container columns={columns ?? 1} spacing={2}>
-        {fields.map((field: any, i) => {
-          const f = typeof field === "function" ? field(formik) : field;
-          return (
-            <Grid key={i} item xs={f.colSpan ?? 1}>
-              {f.render ? (
-                f.render({
-                  ...formik.getFieldProps(f.name),
-                  fullWidth: true,
-                  id: f.name,
-                  label: f.label,
-                })
-              ) : (
-                <TextField
-                  {...f}
-                  fullWidth
-                  id={f.name}
-                  label={f.label}
-                  {...formik.getFieldProps(f.name)}
-                  error={Boolean(formik.errors[f.name])}
-                  helperText={formik.errors[f.name] as any}
-                />
-              )}
-            </Grid>
-          );
-        })}
-      </Grid>
-    </form>
+    <Formik
+      initialValues={
+        !isEmpty(initialValues)
+          ? initialValues
+          : fields.reduce((prev, cur) => ({ ...prev, [cur.name]: "" }), {})
+      }
+      validationSchema={validationSchema}
+      onSubmit={handleSubmit}
+      onReset={() => {}}
+      innerRef={innerRef}
+    >
+      {(formik) => (
+        <form onSubmit={formik.handleSubmit}>
+          <Grid container columns={columns ?? 1} spacing={2}>
+            {fields.map((field: any, i) => {
+              const f = typeof field === "function" ? field(formik) : field;
+              const errors =
+                (formik.touched[f.name] || formik.submitCount > 0) &&
+                (formik.errors[f.name] as any);
+
+              return (
+                <Grid key={i} item xs={f.colSpan ?? 1}>
+                  {f.render ? (
+                    f.render({
+                      ...formik.getFieldProps(f.name),
+                      fullWidth: true,
+                      id: f.name,
+                      label: f.label,
+                      error: !!errors,
+                      helperText: errors,
+                    })
+                  ) : (
+                    <TextField
+                      {...f}
+                      fullWidth
+                      id={f.name}
+                      label={f.label}
+                      {...formik.getFieldProps(f.name)}
+                      error={!!errors}
+                      helperText={errors}
+                    />
+                  )}
+                </Grid>
+              );
+            })}
+          </Grid>
+        </form>
+      )}
+    </Formik>
   );
 }
