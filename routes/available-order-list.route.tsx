@@ -36,7 +36,7 @@ export const availableOrderList: TableConfig = {
         field: "orderType",
         headerName: "Order Type",
         flex: 0.5,
-        renderCell(params) {
+        renderCell(params: any) {
           return orderTypeOptions.find((o) => o.value === params.value)?.label;
         },
       },
@@ -44,7 +44,7 @@ export const availableOrderList: TableConfig = {
         field: "orderVisibility",
         headerName: "Order Visibility",
         flex: 0.6,
-        renderCell(params) {
+        renderCell(params: any) {
           return orderVisibilityOptions.find((o) => o.value === params.value)
             ?.label;
         },
@@ -58,7 +58,7 @@ export const availableOrderList: TableConfig = {
         field: "orderLink",
         headerName: "Order Link",
         flex: 0.5,
-        renderCell(params:any) {
+        renderCell(params: any) {
           return <Link href={params.value}>Link</Link>;
         },
       },
@@ -77,7 +77,7 @@ const userColumns = [
     field: "avatar",
     headerName: "Avatar",
     flex: 0.3,
-    renderCell: (params) => <Avatar src={params.value} />,
+    renderCell: (params: any) => <Avatar src={params.value} />,
   },
   {
     field: "name",
@@ -103,6 +103,7 @@ const userColumns = [
     field: "dob",
     headerName: "Date of Birth",
     flex: 1,
-    valueFormatter: (params) => dayjs(params.value.date).format("DD/MM/YYYY"),
+    valueFormatter: (params: any) =>
+      dayjs(params.value.date).format("DD/MM/YYYY"),
   },
 ];
