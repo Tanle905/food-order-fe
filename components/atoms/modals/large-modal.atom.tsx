@@ -38,7 +38,9 @@ export function ATLargeModal(props: ATLargeModalProps) {
     try {
       callbacks && (await callbacks());
       setOpen(false);
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (

@@ -4,7 +4,7 @@ import {
   FormBuilderMeta,
   MUIFormBuilder,
 } from "../forms/mui-form-builder.molecule";
-import { FormikBag, FormikProps, FormikValues } from "formik";
+import { FormikProps } from "formik";
 import {
   orderTypeOptions,
   orderVisibilityOptions,
@@ -12,8 +12,12 @@ import {
 import { array, object, string } from "yup";
 import { MuiFileInput } from "mui-file-input";
 import { useRef } from "react";
+import {
+  FormBuilderRHFMeta,
+  MUIFormBuilderReactHookForm,
+} from "../forms/mui-form-builder-react-hook-form";
 
-const addOrderFormMeta: FormBuilderMeta = {
+const addOrderFormMeta: FormBuilderRHFMeta = {
   columns: 3,
   validationSchema: object({
     orderName: string()
@@ -66,16 +70,17 @@ const addOrderFormMeta: FormBuilderMeta = {
         </MenuItem>
       )),
     },
-    (form: FormikProps<any>) => {
+    (form: any) => {
       return {
         name: "member",
         label: "Member",
         select: true,
         disabled: form.values?.orderVisibility !== 1,
         children: [],
+        reactFormHookProps: { deps: ["orderVisibility"] },
       };
     },
-    (form: FormikProps<any>) => ({
+    (form: any) => ({
       name: "menu",
       label: "Upload Menu",
       colSpan: 3,
@@ -97,20 +102,30 @@ async function handleSubmitForm(values: any, formikBag: any) {
 }
 
 export function MCAddNewOrderModal() {
-  const formRef = useRef<FormikProps<any>>();
+  const formRef = useRef<any>();
 
   return (
     <ATLargeModal
       title="Add New Order"
       triggerElement={<Button variant="contained">Add New Order</Button>}
       onOk={async () => {
-        const result = await formRef.current?.validateForm();
+        await formRef.current.handleSubmit(
+          (values: any) => {
+            console.log(values);
+          },
+          (error: any) => {
+            console.log('sdf')
+            throw new Error('sdfsdf');
+          }
+        );
 
-        formRef.current?.submitForm();
-        if (result) throw new Error();
+        throw new Error()
       }}
     >
-      <MUIFormBuilder meta={{ ...addOrderFormMeta, innerRef: formRef }} />
+      <MUIFormBuilderReactHookForm
+        meta={{ ...addOrderFormMeta }}
+        ref={formRef}
+      />
     </ATLargeModal>
   );
 }
