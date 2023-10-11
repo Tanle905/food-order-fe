@@ -16,6 +16,7 @@ import {
   FormBuilderRHFMeta,
   MUIFormBuilderReactHookForm,
 } from "../forms/mui-form-builder-react-hook-form";
+import { isEmpty } from "lodash";
 
 const addOrderFormMeta: FormBuilderRHFMeta = {
   columns: 3,
@@ -104,27 +105,29 @@ async function handleSubmitForm(values: any, formikBag: any) {
 export function MCAddNewOrderModal() {
   const formRef = useRef<any>();
 
+  async function submitFormFormik() {
+    const errors = await formRef.current?.validateForm();
+    formRef.current?.submitForm();
+
+    if (!isEmpty(errors)) throw new Error();
+  }
+
+  async function submitFormReactHookForm() {
+    await formRef.current.trigger();
+    await formRef.current.handleSubmit();
+    console.log(formRef.current.formState.errors)
+    if (!isEmpty(formRef.current.formState.errors)) throw new Error();
+  }
+
   return (
     <ATLargeModal
       title="Add New Order"
       triggerElement={<Button variant="contained">Add New Order</Button>}
-      onOk={async () => {
-        await formRef.current.handleSubmit(
-          (values: any) => {
-            console.log(values);
-          },
-          (error: any) => {
-            console.log('sdf')
-            throw new Error('sdfsdf');
-          }
-        );
-
-        throw new Error()
-      }}
+      onOk={submitFormFormik}
     >
-      <MUIFormBuilderReactHookForm
+      <MUIFormBuilder
         meta={{ ...addOrderFormMeta }}
-        ref={formRef}
+        innerRef={formRef}
       />
     </ATLargeModal>
   );

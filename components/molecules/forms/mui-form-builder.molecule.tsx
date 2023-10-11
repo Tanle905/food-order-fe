@@ -6,6 +6,7 @@ import { ObjectSchema } from "yup";
 
 interface MUIFormBuilderProps {
   meta: FormBuilderMeta;
+  innerRef?: any;
 }
 
 export interface FormBuilderMeta {
@@ -17,7 +18,6 @@ export interface FormBuilderMeta {
     formikHelpers: FormikHelpers<any>
   ) => void | Promise<any>) &
     ((values: any, formikBag: FormikBag<any, any>) => any);
-  innerRef?: any;
   fields: (TextFieldProps & {
     name: string;
     colSpan?: number;
@@ -25,13 +25,13 @@ export interface FormBuilderMeta {
   })[];
 }
 
-export function MUIFormBuilder({ meta }: MUIFormBuilderProps) {
+export function MUIFormBuilder({ meta, innerRef }: MUIFormBuilderProps) {
   const {
     initialValues,
     validationSchema,
     fields,
     columns,
-    innerRef,
+    
     handleSubmit,
   } = meta;
 
@@ -51,15 +51,15 @@ export function MUIFormBuilder({ meta }: MUIFormBuilderProps) {
         <form onSubmit={formik.handleSubmit}>
           <Grid container columns={columns ?? 1} spacing={2}>
             {fields.map((field: any, i) => {
-              const f = typeof field === "function" ? field(formik) : field;
+              const {render, ...f} = typeof field === "function" ? field(formik) : field;
               const errors =
                 (formik.touched[f.name] || formik.submitCount > 0) &&
                 (formik.errors[f.name] as any);
 
               return (
                 <Grid key={i} item xs={f.colSpan ?? 1}>
-                  {f.render ? (
-                    f.render({
+                  {render ? (
+                    render({
                       ...formik.getFieldProps(f.name),
                       fullWidth: true,
                       id: f.name,

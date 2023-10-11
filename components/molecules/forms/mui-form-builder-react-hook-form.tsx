@@ -40,13 +40,15 @@ export const MUIFormBuilderReactHookForm = React.forwardRef(
         : meta.fields.reduce((prev, cur) => ({ ...prev, [cur.name]: "" }), {}),
       ...(meta.validationSchema && {
         resolver: yupResolver(meta.validationSchema),
+        mode: 'onChange',
       }),
     });
 
     useImperativeHandle(ref, () => {
       return {
-        validateForm: trigger,
+        trigger,
         handleSubmit,
+        formState,
       };
     });
 
@@ -54,7 +56,7 @@ export const MUIFormBuilderReactHookForm = React.forwardRef(
       <form onSubmit={handleSubmit(meta.handleSubmit)}>
         <Grid container columns={meta.columns ?? 1} spacing={2}>
           {meta.fields.map((field: any, i) => {
-            const f =
+            const { render, reactFormHookProps, ...f } =
               typeof field === "function"
                 ? field({ values: getValues(), setFieldValue: setValue, watch })
                 : field;
@@ -70,8 +72,8 @@ export const MUIFormBuilderReactHookForm = React.forwardRef(
 
             return (
               <Grid key={i} item xs={f.colSpan ?? 1}>
-                {f?.render?.({
-                  ...register(f.name, f.reactFormHookProps),
+                {render?.({
+                  ...register(f.name, reactFormHookProps),
                   ...fieldProps,
                 }) ?? <TextField {...register(f.name)} {...fieldProps} />}
               </Grid>
